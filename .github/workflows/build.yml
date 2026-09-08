@@ -17,11 +17,11 @@ jobs:
           - mt7981b
         include:
           - target: x86_64
-            sdk_url: https://mirrors.ustc.edu.cn/openwrt/releases/23.05.3/targets/x86/64/openwrt-sdk-23.05.3-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+            sdk_url: https://downloads.openwrt.org/openwrt/releases/23.05.3/targets/x86/64/openwrt-sdk-23.05.3-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz
           - target: aarch64
-            sdk_url: https://mirrors.ustc.edu.cn/openwrt/releases/23.05.3/targets/bcm27xx/bcm2711/openwrt-sdk-23.05.3-bcm27xx-bcm2711_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+            sdk_url: https://downloads.openwrt.org/openwrt/releases/23.05.3/targets/bcm27xx/bcm2711/openwrt-sdk-23.05.3-bcm27xx-bcm2711_gcc-12.3.0_musl.Linux-x86_64.tar.xz
           - target: mt7981b
-            sdk_url: https://mirrors.ustc.edu.cn/openwrt/releases/23.05.3/targets/mediatek/filogic/openwrt-sdk-23.05.3-mediatek-filogic_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+            sdk_url: https://downloads.openwrt.org/openwrt/releases/23.05.3/targets/mediatek/filogic/openwrt-sdk-23.05.3-mediatek-filogic_gcc-12.3.0_musl.Linux-x86_64.tar.xz
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
