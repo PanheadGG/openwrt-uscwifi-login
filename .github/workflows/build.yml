@@ -10,10 +10,11 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         target:
           - x86_64
-          - armv7
+          # - armv7
           - aarch64
           - mt7981b
         include:
