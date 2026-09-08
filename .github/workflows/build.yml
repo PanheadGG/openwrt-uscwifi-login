@@ -65,10 +65,12 @@ jobs:
       - name: Generate build config
         run: |
           cd sdk/openwrt-sdk
-          make defconfig
+          # SDK should already have a .config; if not, create empty one
+          [ -f .config ] || touch .config
           echo "CONFIG_PACKAGE_uscwifi-logind=m" >> .config
           echo "CONFIG_PACKAGE_luci-app-uscwifi-login=m" >> .config
-          make defconfig
+          # Non-interactively fill in defaults for new config options only
+          make olddefconfig
 
       - name: Compile ipk
         run: |
