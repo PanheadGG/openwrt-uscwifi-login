@@ -37,51 +37,55 @@ jobs:
         uses: actions/cache@v4
         with:
           path: sdk
-          key: sdk-${{ matrix.target }}-${{ hashFiles('**/Makefile') }}
+          key: sdk-${{ matrix.target }}-23.05.3-v2
 
-      - name: Download OpenWrt SDK ${{ matrix.target }}
+      - name: Download and prepare OpenWrt SDK ${{ matrix.target }}
         run: |
           mkdir -p sdk
           cd sdk
-          if [ ! -d "openwrt-sdk" ];then
+          if [ ! -d "openwrt-sdk" ]; then
             rm -f *.tar.xz
-            wget --retry-connrefused --tries=5 -q ${{ matrix.sdk_url }}
-            if ! file *.tar.xz | grep -q "XZ compressed data"; then
+            echo "Downloading SDK..."
+            wget --retry-connrefused --tries=5 -q ${{ matrix.sdk_url }} -O sdk.tar.xz
+            if ! file sdk.tar.xz | grep -q "XZ compressed data"; then
               echo "ERROR: Downloaded file is not valid XZ archive, probably 404 html"
               exit 1
             fi
-            tar -xf *.tar.xz
-            rm -f *.tar.xz
+            tar -xf sdk.tar.xz
+            rm -f sdk.tar.xz
             mv openwrt-sdk-* openwrt-sdk
             cd openwrt-sdk
             ./scripts/feeds update -a
             ./scripts/feeds install -a
+          else
+            echo "SDK found in cache, skipping download"
           fi
 
       - name: Copy package into SDK
         run: |
-          rsync -av source/package/ sdk/openwrt-sdk/package/
+          rsync -av --delete source/package/ sdk/openwrt-sdk/package/
 
       - name: Generate build config
         run: |
           cd sdk/openwrt-sdk
-          # SDK should already have a .config; if not, create empty one
-          [ -f .config ] || touch .config
-          echo "CONFIG_PACKAGE_uscwifi-logind=m" >> .config
-          echo "CONFIG_PACKAGE_luci-app-uscwifi-login=m" >> .config
-          # Non-interactively fill in defaults for new config options only
-          make olddefconfig
+          # Generate default config non-interactively
+          # (all packages set to =m, which is the standard SDK mode)
+          make defconfig
 
-      - name: Compile ipk
+      - name: Compile uscwifi-logind
         run: |
           cd sdk/openwrt-sdk
-          make package/uscwifi-logind/compile V=s
-          make package/luci-app-uscwifi-login/compile V=s
+          make package/uscwifi-logind/compile V=s -j$(nproc)
+
+      - name: Compile luci-app-uscwifi-login
+        run: |
+          cd sdk/openwrt-sdk
+          make package/luci-app-uscwifi-login/compile V=s -j$(nproc)
 
       - name: Collect ipk artifacts
         run: |
           mkdir -p out/${{ matrix.target }}
-          cp sdk/openwrt-sdk/bin/packages/*/base/*.ipk out/${{ matrix.target }}/
+          find sdk/openwrt-sdk/bin/packages -name "uscwifi*.ipk" -exec cp {} out/${{ matrix.target }}/ \;
           ls -la out/${{ matrix.target }}
 
       - name: Upload ${{ matrix.target }} ipk
