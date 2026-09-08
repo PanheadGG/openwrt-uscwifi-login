@@ -27,7 +27,7 @@ endef
 define Build/Compile
 	$(TARGET_CC) $(TARGET_CFLAGS) -o $(PKG_BUILD_DIR)/uscwifi-logind \
 	$(PKG_BUILD_DIR)/main.c $(PKG_BUILD_DIR)/cJSON.c \
-	-luci
+	-luciuci
 endef
 
 define Package/uscwifi-logind/install
