@@ -62,6 +62,14 @@ jobs:
         run: |
           rsync -av source/package/ sdk/openwrt-sdk/package/
 
+      - name: Generate build config
+        run: |
+          cd sdk/openwrt-sdk
+          make defconfig
+          echo "CONFIG_PACKAGE_uscwifi-logind=m" >> .config
+          echo "CONFIG_PACKAGE_luci-app-uscwifi-login=m" >> .config
+          make defconfig
+
       - name: Compile ipk
         run: |
           cd sdk/openwrt-sdk
