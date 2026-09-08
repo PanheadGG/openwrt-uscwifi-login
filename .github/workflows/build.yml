@@ -37,7 +37,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: sdk
-          key: sdk-${{ matrix.target }}-23.05.3-v2
+          key: sdk-${{ matrix.target }}-23.05.3-v3
 
       - name: Download and prepare OpenWrt SDK ${{ matrix.target }}
         run: |
@@ -63,7 +63,7 @@ jobs:
 
       - name: Copy package into SDK
         run: |
-          rsync -av --delete source/package/ sdk/openwrt-sdk/package/
+          rsync -av source/package/ sdk/openwrt-sdk/package/
 
       - name: Generate build config
         run: |
