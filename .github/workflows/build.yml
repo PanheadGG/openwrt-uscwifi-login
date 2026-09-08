@@ -1,0 +1,79 @@
+name: Build uscwifi-login ipk
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        target:
+          - x86_64
+          - armv7
+          - aarch64
+          - mt7981b
+        include:
+          - target: x86_64
+            sdk_url: https://downloads.openwrt.org/releases/23.05.3/targets/x86/64/openwrt-sdk-23.05.3-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+          - target: armv7
+            sdk_url: https://downloads.openwrt.org/releases/23.05.3/targets/bcm27xx/bcm2709/openwrt-sdk-23.05.3-bcm27xx-bcm2709_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+          - target: aarch64
+            sdk_url: https://downloads.openwrt.org/releases/23.05.3/targets/bcm27xx/bcm2711/openwrt-sdk-23.05.3-bcm27xx-bcm2711_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+          - target: mt7981b
+            sdk_url: https://downloads.openwrt.org/releases/23.05.3/targets/mediatek/filogic/openwrt-sdk-23.05.3-mediatek-filogic_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          path: source
+
+      - name: Install build dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential libncurses-dev libssl-dev python3 python3-pip unzip wget rsync
+
+      - name: Cache OpenWrt SDK ${{ matrix.target }}
+        uses: actions/cache@v4
+        with:
+          path: sdk
+          key: sdk-${{ matrix.target }}-${{ hashFiles('**/Makefile') }}
+
+      - name: Download OpenWrt SDK ${{ matrix.target }}
+        run: |
+          mkdir -p sdk
+          cd sdk
+          if [ ! -d "openwrt-sdk" ];then
+            wget -q ${{ matrix.sdk_url }}
+            tar -xf *.tar.xz
+            mv openwrt-sdk-* openwrt-sdk
+            cd openwrt-sdk
+            ./scripts/feeds update -a
+            ./scripts/feeds install -a
+          fi
+
+      - name: Copy package into SDK
+        run: |
+          rsync -av source/package/ sdk/openwrt-sdk/package/
+
+      - name: Compile ipk
+        run: |
+          cd sdk/openwrt-sdk
+          make package/uscwifi-logind/compile V=s
+          make package/luci-app-uscwifi-login/compile V=s
+
+      - name: Collect ipk artifacts
+        run: |
+          mkdir -p out/${{ matrix.target }}
+          cp sdk/openwrt-sdk/bin/packages/*/base/*.ipk out/${{ matrix.target }}/
+          ls -la out/${{ matrix.target }}
+
+      - name: Upload ${{ matrix.target }} ipk
+        uses: actions/upload-artifact@v4
+        with:
+          name: ipk-${{ matrix.target }}
+          path: out/${{ matrix.target }}/*.ipk
