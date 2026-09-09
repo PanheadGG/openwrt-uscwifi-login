@@ -37,7 +37,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: sdk
-          key: sdk-${{ matrix.target }}-23.05.3-v4
+          key: sdk-${{ matrix.target }}-23.05.3-v5
 
       - name: Download and prepare OpenWrt SDK ${{ matrix.target }}
         run: |
@@ -55,8 +55,10 @@ jobs:
             rm -f sdk.tar.xz
             mv openwrt-sdk-* openwrt-sdk
             cd openwrt-sdk
-            # Add OpenWrt source as base feed for core packages (uci, uclient, libubox, etc.)
-            # that are not included in the SDK or external feeds
+            # SDK already has a 'src-git-full base' entry (full clone = slow/unreliable).
+            # Replace it with a shallow 'src-git' clone from GitHub for core packages
+            # (uci, uclient, libubox, etc.) that the SDK/external feeds don't include.
+            sed -i '/^src-git[a-z-]* base /d' feeds.conf.default
             echo "src-git base https://github.com/openwrt/openwrt.git;v23.05.3" >> feeds.conf.default
             ./scripts/feeds update -a
             ./scripts/feeds install -a
@@ -74,6 +76,17 @@ jobs:
           # Generate default config non-interactively
           # (all packages set to =m, which is the standard SDK mode)
           make defconfig
+
+      - name: Verify base feed packages
+        run: |
+          cd sdk/openwrt-sdk
+          echo "=== feeds.conf.default ==="
+          cat feeds.conf.default
+          echo "=== Installed base feed packages ==="
+          ls -la package/feeds/base/ 2>/dev/null || echo "ERROR: package/feeds/base/ does not exist"
+          test -d package/feeds/base/libuci || { echo "ERROR: libuci not installed from base feed"; exit 1; }
+          test -d package/feeds/base/uclient-fetch || { echo "ERROR: uclient-fetch not installed from base feed"; exit 1; }
+          echo "All required base feed packages are installed."
 
       - name: Compile uscwifi-logind
         run: |
