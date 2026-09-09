@@ -2,8 +2,8 @@ local uci = luci.model.uci.cursor()
 local fs = require "nixio.fs"
 
 local m = Map("uscwifi", "USC校园网登录设置")
-local s = m:section(TypedSection, "main", "账号配置")
-s.anonymous = true
+local s = m:section(NamedSection, "main", "账号配置")
+s.addremove = false
 
 s:option(Value, "username", "用户名")
 s:option(Value, "password", "密码").password = true
