@@ -84,8 +84,9 @@ jobs:
           cat feeds.conf.default
           echo "=== Installed base feed packages ==="
           ls -la package/feeds/base/ 2>/dev/null || echo "ERROR: package/feeds/base/ does not exist"
-          test -d package/feeds/base/libuci || { echo "ERROR: libuci not installed from base feed"; exit 1; }
-          test -d package/feeds/base/uclient-fetch || { echo "ERROR: uclient-fetch not installed from base feed"; exit 1; }
+          # uci/Makefile defines libuci; uclient/Makefile defines uclient-fetch
+          test -d package/feeds/base/uci || { echo "ERROR: uci (provides libuci) not installed from base feed"; exit 1; }
+          test -d package/feeds/base/uclient || { echo "ERROR: uclient (provides uclient-fetch) not installed from base feed"; exit 1; }
           echo "All required base feed packages are installed."
 
       - name: Compile uscwifi-logind
