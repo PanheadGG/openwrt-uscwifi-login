@@ -15,6 +15,7 @@ define Package/luci-app-uscwifi-login
   SUBMENU:=3. Applications
   TITLE:=USC WiFi Login WebUI
   DEPENDS:=+uscwifi-logind
+  PKGARCH:=all
 endef
 
 define Package/luci-app-uscwifi-login/description

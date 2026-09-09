@@ -16,10 +16,10 @@ jobs:
 #          - aarch64
           - mt7981b
         include:
-          - target: x86_64
-            sdk_url: https://downloads.openwrt.org/releases/24.10.2/targets/x86/64/openwrt-sdk-24.10.2-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.zst
-          - target: aarch64
-            sdk_url: https://downloads.openwrt.org/releases/24.10.2/targets/bcm27xx/bcm2711/openwrt-sdk-24.10.2-bcm27xx-bcm2711_gcc-13.3.0_musl.Linux-x86_64.tar.zst
+#          - target: x86_64
+#            sdk_url: https://downloads.openwrt.org/releases/24.10.2/targets/x86/64/openwrt-sdk-24.10.2-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.zst
+#          - target: aarch64
+#            sdk_url: https://downloads.openwrt.org/releases/24.10.2/targets/armsr/armv8/openwrt-sdk-24.10.2-armsr-armv8_gcc-13.3.0_musl.Linux-x86_64.tar.zst
           - target: mt7981b
             sdk_url: https://downloads.openwrt.org/releases/24.10.2/targets/mediatek/filogic/openwrt-sdk-24.10.2-mediatek-filogic_gcc-13.3.0_musl.Linux-x86_64.tar.zst
     steps:
