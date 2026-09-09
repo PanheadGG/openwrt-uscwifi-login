@@ -31,7 +31,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt update
-          sudo apt install -y build-essential libncurses-dev libssl-dev python3 python3-pip unzip wget rsync file
+          sudo apt install -y build-essential libncurses-dev libssl-dev python3 python3-pip unzip wget rsync file cmake
 
       - name: Cache OpenWrt SDK ${{ matrix.target }}
         uses: actions/cache@v4
@@ -88,6 +88,12 @@ jobs:
           test -d package/feeds/base/uci || { echo "ERROR: uci (provides libuci) not installed from base feed"; exit 1; }
           test -d package/feeds/base/uclient || { echo "ERROR: uclient (provides uclient-fetch) not installed from base feed"; exit 1; }
           echo "All required base feed packages are installed."
+
+      - name: Build dependencies (libuci, uclient-fetch)
+        run: |
+          cd sdk/openwrt-sdk
+          make package/uci/compile V=s -j$(nproc)
+          make package/uclient/compile V=s -j$(nproc)
 
       - name: Compile uscwifi-logind
         run: |

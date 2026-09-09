@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <libuci.h>
+#include <uci.h>
 #include "cJSON.h"
 
 #define STATUS_FILE "/var/run/uscwifi.status"

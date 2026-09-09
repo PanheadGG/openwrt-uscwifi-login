@@ -25,7 +25,8 @@ define Build/Prepare
 endef
 
 define Build/Compile
-	$(TARGET_CC) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) $(TARGET_LDFLAGS) \
+	$(TARGET_CC) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -I$(STAGING_DIR)/usr/include \
+	$(TARGET_LDFLAGS) -L$(STAGING_DIR)/usr/lib \
 	-o $(PKG_BUILD_DIR)/uscwifi-logind \
 	$(PKG_BUILD_DIR)/main.c $(PKG_BUILD_DIR)/cJSON.c \
 	-luci
