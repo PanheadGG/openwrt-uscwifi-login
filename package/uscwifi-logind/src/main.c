@@ -17,12 +17,12 @@ static int read_uci_cfg(void)
     char buf[128];
 
     if (!ctx) return -1;
-    uci_setconfdir(ctx, "/etc/config");
+    uci_set_confdir(ctx, "/etc/config");
 
 #define GET_UCI(cfg,sec,opt,out,sz) do{ \
     snprintf(buf,sizeof(buf),"%s.%s.%s",cfg,sec,opt);\
-    if (!uci_lookup_ptr(ctx, &ptr, buf, true) && ptr.o && ptr.o->v) {\
-        strncpy(out, ptr.o->v, sz-1);\
+    if (!uci_lookup_ptr(ctx, &ptr, buf, true) && ptr.o && ptr.o->type == UCI_TYPE_STRING && ptr.o->v.string) {\
+        strncpy(out, ptr.o->v.string, sz-1);\
         out[sz-1] = 0;\
     }\
 }while(0)
