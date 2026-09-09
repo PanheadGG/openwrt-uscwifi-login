@@ -37,7 +37,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: sdk
-          key: sdk-${{ matrix.target }}-23.05.3-v3
+          key: sdk-${{ matrix.target }}-23.05.3-v4
 
       - name: Download and prepare OpenWrt SDK ${{ matrix.target }}
         run: |
@@ -55,6 +55,9 @@ jobs:
             rm -f sdk.tar.xz
             mv openwrt-sdk-* openwrt-sdk
             cd openwrt-sdk
+            # Add OpenWrt source as base feed for core packages (uci, uclient, libubox, etc.)
+            # that are not included in the SDK or external feeds
+            echo "src-git base https://github.com/openwrt/openwrt.git;v23.05.3" >> feeds.conf.default
             ./scripts/feeds update -a
             ./scripts/feeds install -a
           else
